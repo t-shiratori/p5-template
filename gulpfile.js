@@ -10,7 +10,9 @@ var src_url_browserify = 'app/src/sketch.js',
     output_file_name_browserify = 'sketch.js',
     src_url_watch_js = 'app/src/**/*.js',
     dest_url_watch_html = 'app/dist/*.html',
-    base_dir_serve = 'app/dist';
+    base_dir_serve = 'app/dist',
+    src_url_sass = 'app/src/**/*.scss',
+    dest_url_sass = 'app/dist/';
 
 //browserify
 gulp.task('browserify',function (){
@@ -30,6 +32,14 @@ gulp.task('browserify',function (){
     .pipe(browserSync.stream());
 });
 
+//sass
+gulp.task('sass',function(){
+  return gulp.src(src_url_sass)
+    .pipe(gulpPlugins.sass().on('error', gulpPlugins.sass.logError))
+    .pipe(gulp.dest(dest_url_sass))
+    .pipe(browserSync.stream());
+});
+
 //server
 gulp.task('serve', function() {
     browserSync.init({
@@ -41,10 +51,10 @@ gulp.task('serve', function() {
 
 //watch
 gulp.task('watch', function() {
-  var targets = [
-    src_url_watch_js,
-  ];
-  gulp.watch(targets, ['browserify']);
+  var targetsJs = [src_url_watch_js];
+  var targetsCss = [src_url_sass];
+  gulp.watch(targetsJs, ['browserify']).on('change', browserSync.reload);
+  gulp.watch(targetsCss, ['sass']).on('change', browserSync.reload);
   gulp.watch(dest_url_watch_html).on('change', browserSync.reload);
 });
 
