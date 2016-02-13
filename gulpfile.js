@@ -5,10 +5,17 @@ var gulp = require('gulp'),
     source = require('vinyl-source-stream'),
     browserSync = require('browser-sync');
 
+var src_url_browserify = 'app/src/sketch.js',
+    dest_url_browserify = 'app/dist',
+    output_file_name_browserify = 'sketch.js',
+    src_url_watch_js = 'app/src/**/*.js',
+    dest_url_watch_html = 'app/dist/*.html',
+    base_dir_serve = 'app/dist';
+
 //browserify
 gulp.task('browserify',function (){
   browserify({
-    entries: 'app/src/sketch.js',
+    entries: src_url_browserify,
     extensions: ['.js']
   })
   .transform(babelify,{presets: ['es2015']},{ debug: true })
@@ -18,8 +25,8 @@ gulp.task('browserify',function (){
 			console.log('Error : ' + err.message);
 			this.emit('end');
 		})
-    .pipe(source('sketch.js'))
-  	.pipe(gulp.dest('app/dist'))
+    .pipe(source(output_file_name_browserify))
+  	.pipe(gulp.dest(dest_url_browserify))
     .pipe(browserSync.stream());
 });
 
@@ -27,7 +34,7 @@ gulp.task('browserify',function (){
 gulp.task('serve', function() {
     browserSync.init({
         server: {
-            baseDir: 'app/dist'
+            baseDir: base_dir_serve
         }
     });
 });
@@ -35,11 +42,10 @@ gulp.task('serve', function() {
 //watch
 gulp.task('watch', function() {
   var targets = [
-    'app/src/**/*.js',
+    src_url_watch_js,
   ];
   gulp.watch(targets, ['browserify']);
-  gulp.watch('app/dist/*.html').on('change', browserSync.reload);
+  gulp.watch(dest_url_watch_html).on('change', browserSync.reload);
 });
-
 
 gulp.task('default',['serve','watch']);
